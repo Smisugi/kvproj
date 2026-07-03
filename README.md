@@ -1,4 +1,4 @@
-# Project Documentation
+# Key Value Storage - Project Documentation
 This project is a key value store that defines the following interface
 
 ```
