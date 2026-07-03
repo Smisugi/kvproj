@@ -1,24 +1,26 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "kv.h"
 
 kv_t *kv_init(size_t capacity){
   //probably wrong but oh well
-  size_t count = 0;
-  size_t capacity = capacity;
+ 
   //malloc for kv_t
   char *kv_t = malloc(capacity * sizeof(*kv_t));
   if(kv_t == NULL){ //avoid deref NULL ptr
     printf("Error: Malloc failed for kv_t.");
-    return -1;
+    return NULL;
   }
 
   //malloc for kv_pair_t
   char *kv_pair_t = malloc(capacity * sizeof(*kv_pair_t));
   if(kv_pair_t == NULL){
     printf("Error. Malloc failed for kv_pair_t.");
-    return -1;
+    return NULL;
   }
+  size_t count = 0;
+  capacity = capacity;
   return NULL;
 }
 
