@@ -33,7 +33,12 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     // You need your own copies -> strdup().
 
     //need to check if key exists, run get func
-    if (kv_get(db, key) != NULL) { //does not exist in db
+    char existing_key = kv_get(db, key);
+    if (existing_key != NULL){ //check if key in store
+        free(existing_key);
+        db->entries.val = strdup(value); //STUCK HERE need to get specific key value to input
+    }
+    else if (kv_get(db, key) == NULL) { //does not exist in db
     }
     return -1;
 
