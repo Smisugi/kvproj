@@ -5,23 +5,21 @@
 
 kv_t *kv_init(size_t capacity){
   //probably wrong but oh well
- 
+
+  kv_pair_t *new_pair = malloc(capacity * sizeof(kv_pair_t));
+  if(new_pair == NULL){
+    printf("Error: Malloc failed for kv_pair_t.");
+    return NULL;
+  }
+  kv_t *new_db = malloc(sizeof(kv_t));
   //malloc for kv_t
-  char *kv_t = malloc(capacity * sizeof(*kv_t));
-  if(kv_t == NULL){ //avoid deref NULL ptr
+  if(new_db == NULL){
     printf("Error: Malloc failed for kv_t.");
     return NULL;
   }
-
-  //malloc for kv_pair_t
-  char *kv_pair_t = malloc(capacity * sizeof(*kv_pair_t));
-  if(kv_pair_t == NULL){
-    printf("Error. Malloc failed for kv_pair_t.");
-    return NULL;
-  }
-  size_t count = 0;
-  capacity = capacity;
-  return NULL;
+  new_db->count = 0;
+  new_db->capacity = capacity;
+  return new_db;
 }
 
 int kv_put(kv_t *db, const char *key, const char *value) {
@@ -33,12 +31,24 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     // IMPORTANT: don't just store the `key`/`value` pointers you were given.
     // The caller might free or reuse that memory after this function returns.
     // You need your own copies -> strdup().
+
+    //need to check if key exists, run get func
+    if (kv_get(db, key) != NULL) { //does not exist in db
+    }
     return -1;
+
 }
 
 char *kv_get(kv_t *db, const char *key) {
     // linear scan for now (an array-backed store can't do better than O(n)
     // without adding a hash index - that's a good v2 upgrade later)
+
+    for (size_t i = 0; i < db->count; i++) { //linear for now, improve later
+      if (strcmp(key, db->entries[i].key) == 0) {
+        return db->entries[i].val;
+      }
+    }
+    printf("Key not found.");
     return NULL;
 }
 
