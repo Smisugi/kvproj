@@ -44,6 +44,11 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     }
     else { //does not exist in db
       //if size exceeded (count == capacity)
+        if (db->count == db->capacity){
+            int new_capacity = db->count * 2;
+            db->entries = realloc(db->entries, new_capacity * sizeof(kv_pair_t));
+            db->capacity = new_capacity;
+        }
       //else append new pair
         db->entries[db->count].key = key;
         db->entries[db->count].val = value;
