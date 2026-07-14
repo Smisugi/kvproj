@@ -6,15 +6,17 @@
 kv_t *kv_init(size_t capacity){
   //probably wrong but oh well
 
-  kv_pair_t *new_pair = malloc(capacity * sizeof(kv_pair_t));
-  if(new_pair == NULL){
-    printf("Error: Malloc failed for kv_pair_t.");
-    return NULL;
-  }
+  
   kv_t *new_db = malloc(sizeof(kv_t));
   //malloc for kv_t
   if(new_db == NULL){
     printf("Error: Malloc failed for kv_t.");
+    return NULL;
+  }
+  
+  new_db->entries = malloc(capacity * sizeof(kv_pair_t));
+  if(new_db->entries == NULL){
+    printf("Error: Malloc failed for kv_pair_t.");
     return NULL;
   }
   new_db->count = 0;
@@ -33,16 +35,25 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     // You need your own copies -> strdup().
 
     //need to check if key exists, run get func
-    char existing_key = kv_get(db, key);
-    if (existing_key != NULL){ //check if key in store
-        free(existing_key);
-        db->entries.val = strdup(value); //STUCK HERE need to get specific key value to input
+    printf("finding pair...\n");
+    char *existing_pair = kv_get(db, key);
+    if (existing_pair != NULL){ //check if key in store
+        free(existing_pair);
+        existing_pair = strdup(value);
+        return 1;
     }
-    else if (kv_get(db, key) == NULL) { //does not exist in db
+    else { //does not exist in db
+      //if size exceeded (count == capacity)
+      //else append new pair
+        db->entries[db->count].key = key;
+        db->entries[db->count].val = value;
+        db->count++;
+        return 1;
     }
     return -1;
 
 }
+
 
 char *kv_get(kv_t *db, const char *key) {
     // linear scan for now (an array-backed store can't do better than O(n)
@@ -53,7 +64,7 @@ char *kv_get(kv_t *db, const char *key) {
         return db->entries[i].val;
       }
     }
-    printf("Key not found.");
+    printf("Key not found.\n");
     return NULL;
 }
 

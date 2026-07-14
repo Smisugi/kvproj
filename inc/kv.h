@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 typedef struct {
-  //def key as int and val as char
+  //def key and val as char
   char * key;
   char * val;
 } kv_pair_t;

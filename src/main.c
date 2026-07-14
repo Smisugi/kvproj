@@ -11,7 +11,9 @@ int main(){
     return 1;
   }
   printf("\ndb: %p\n", db);
-  kv_get(db, "test");
+  printf("db entries: %p\n", db->entries);
+  kv_put(db, "g", "a");
+  printf("running get... \nfound value: %s\n", kv_get(db, "g"));
   kv_free(db);
   return 0;
 }
