@@ -35,7 +35,6 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     // You need your own copies -> strdup().
 
     //need to check if key exists, run get func
-    printf("finding pair...\n");
     char *existing_pair = kv_get(db, key);
     if (existing_pair != NULL){ //check if key in store
         free(existing_pair);
@@ -69,7 +68,6 @@ char *kv_get(kv_t *db, const char *key) {
         return db->entries[i].val;
       }
     }
-    printf("Key not found.\n");
     return NULL;
 }
 
