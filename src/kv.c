@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "kv.h"
+#define _POSIX_C_SOURCE 200809L
 
 kv_t *kv_init(size_t capacity){
   //probably wrong but oh well
@@ -35,27 +36,42 @@ int kv_put(kv_t *db, const char *key, const char *value) {
     // You need your own copies -> strdup().
 
     //need to check if key exists, run get func
-    char *existing_pair = kv_get(db, key);
-    if (existing_pair != NULL){ //check if key in store
-        free(existing_pair);
-        existing_pair = strdup(value);
+    printf("new put\n");
+    for (int i = 0; i < db->count; i++){
+      if (strcmp(db->entries[i].key, key) == 0){
+        free(db->entries[i].val);
+        db->entries[i].val = strdup(value);
         return 1;
+      }
     }
-    else { //does not exist in db
-      //if size exceeded (count == capacity)
-        if (db->count == db->capacity){
-            int new_capacity = db->count * 2;
-            db->entries = realloc(db->entries, new_capacity * sizeof(kv_pair_t));
-            db->capacity = new_capacity;
-        }
+    //does not exist in db
+    //if size exceeded (count == capacity)
+    if (db->count == db->capacity){
+      int new_capacity = (db->capacity == 0) ? 4 : db->capacity * 2;
+      kv_pair_t *tmp = realloc(db->entries, new_capacity * sizeof(kv_pair_t));
+      if (tmp == NULL) {
+        printf("Error: realloc failed\n");
+        return -1;
+      }
+      db->entries = tmp;
+      db->capacity = new_capacity;
+    }
       //else append new pair
-        db->entries[db->count].key = key;
-        db->entries[db->count].val = value;
-        db->count++;
-        return 1;
+    printf("appending new pair...\n");
+    db->entries[db->count].key = strdup(key);
+    if (db->entries[db->count].key == NULL){
+      printf("Error: Malloc failed for key");
+      return -1;
     }
-    return -1;
-
+        
+    db->entries[db->count].val = strdup(value);
+    if (db->entries[db->count].val == NULL){
+      printf("Error: Malloc failed for val");
+      return -1;
+    }
+    printf("append success\n");
+    db->count++;
+    return 1;
 }
 
 
@@ -75,10 +91,33 @@ int kv_delete(kv_t *db, const char *key) {
     // find the entry, free its key and value strings,
     // then shift everything after it left by one slot (or swap-with-last
     // if you don't care about order) and decrement count.
+    
+    //getter func
+    for (size_t i = 0; i < db->count; i++){
+      if (strcmp(db->entries[i].key, key) == 0){
+          free(db->entries[i].key);
+          free(db->entries[i].val);
+
+          for (size_t j = i; j < db->count - 1; j++){
+              db->entries[j] = db->entries[j-1];
+          }
+      }   
+      db->count--;
+      return 1;
+    }
+    printf("Error: Key not found.\n");
     return -1;
 }
 
 void kv_free(kv_t *db) {
     // free every key/value string, then the entries array, then db itself.
     // get the order right or you'll leak or double-free.
+    for (size_t i = db->count - 1; i > 0; i--){
+      printf("freeing value %s at index %ld", db->entries[i].val, i);
+    
+      free(db->entries[i].key);
+      free(db->entries[i].val);
+    }
+    free(db->entries);
+    free(db);
 }
